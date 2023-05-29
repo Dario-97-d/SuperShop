@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
+using SuperShop.Web.Helpers;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SuperShop.Web.Controllers
@@ -9,16 +12,18 @@ namespace SuperShop.Web.Controllers
     public class ProductsController : Controller
     {
         readonly IProductRepository _productRepository;
+        readonly IUserHelper _userHelper;
 
-        public ProductsController(IProductRepository productRepository)
+        public ProductsController(IProductRepository productRepository, IUserHelper userHelper)
         {
             _productRepository = productRepository;
+            _userHelper = userHelper;
         }
 
         // GET: Products
-        public IActionResult Index()
+        public IActionResult Index(string? param)
         {
-            return View(_productRepository.GetAll());
+            return View(_productRepository.GetAll().OrderBy(SortBy(param)));
         }
 
         // GET: Products/Details/5
@@ -53,6 +58,8 @@ namespace SuperShop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                // TODO: Update user -> logged user
+                product.User = await _userHelper.GetUserByEmailAsync("dario@e.mail");
                 await _productRepository.CreateAsync(product);
                 return RedirectToAction(nameof(Index));
             }
@@ -139,6 +146,20 @@ namespace SuperShop.Web.Controllers
         private async Task<bool> ProductExists(Product p)
         {
             return await _productRepository.ExistsAsync(p);
+        }
+
+        static Func<Product, object> SortBy(string? param)
+        {
+            if (param == null)
+                return p => p.Id;
+
+            return param switch
+            {
+                nameof(Product.Name) => p => p.Name,
+                nameof(Product.Price) => p => p.Price,
+                nameof(Product.Stock) => p => p.Stock,
+                _ => p => p.Id
+            };
         }
     }
 }

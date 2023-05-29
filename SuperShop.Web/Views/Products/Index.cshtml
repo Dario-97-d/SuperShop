@@ -13,10 +13,12 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                <a asp-action="Index/@Html.DisplayNameFor(model => model.Name)"
+                   class="fa fa-arrow-down">@Html.DisplayNameFor(model => model.Name)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                <a asp-action="Index/@Html.DisplayNameFor(model => model.Price)"
+                   class="fa fa-arrow-down">@Html.DisplayNameFor(model => model.Price)</a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ImageUrl)
@@ -31,7 +33,8 @@
                 @Html.DisplayNameFor(model => model.IsAvailable)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Stock)
+                <a asp-action="Index/@Html.DisplayNameFor(model => model.Stock)"
+                   class="fa fa-arrow-down">@Html.DisplayNameFor(model => model.Stock)</a>
             </th>
             <th></th>
         </tr>
