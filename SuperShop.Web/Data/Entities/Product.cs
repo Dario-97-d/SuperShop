@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using SuperShop.Web.Models;
 
 namespace SuperShop.Web.Data.Entities
 {
@@ -27,15 +28,15 @@ namespace SuperShop.Web.Data.Entities
         [Display(Name = "Last Purchase")]
         public DateTime? LastPurchase { get; set; }
 
-        
+
         [Display(Name = "Last Sale")]
         public DateTime? LastSale { get; set; }
 
-        
+
         [Display(Name = "Is Available")]
         public bool IsAvailable { get; set; }
 
-        
+
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
         public double Stock { get; set; }
 
@@ -44,6 +45,25 @@ namespace SuperShop.Web.Data.Entities
 
         public string ImageFullPath =>
             string.IsNullOrEmpty(ImageUrl) ? null : "https://localhost:44389/" + ImageUrl[1..];
+
+
+        public Product()
+        {
+
+        }
+
+        public Product(ProductViewModel pvm)
+        {
+            Id = pvm.Id;
+            ImageUrl = pvm.ImageUrl;
+            IsAvailable = pvm.IsAvailable;
+            LastPurchase = pvm.LastPurchase;
+            LastSale = pvm.LastSale;
+            Name = pvm.Name;
+            Price = pvm.Price;
+            Stock = pvm.Stock;
+            User = pvm.User;
+        }
 
     }
 }

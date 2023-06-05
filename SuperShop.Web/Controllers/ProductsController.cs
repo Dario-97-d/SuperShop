@@ -1,7 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data;
@@ -14,11 +14,16 @@ namespace SuperShop.Web.Controllers
     public class ProductsController : Controller
     {
         readonly IProductRepository _productRepository;
+        readonly IConverterHelper _converterHelper;
+        readonly IImageHelper _imageHelper;
         readonly IUserHelper _userHelper;
 
-        public ProductsController(IProductRepository productRepository, IUserHelper userHelper)
+        public ProductsController(IProductRepository productRepository,
+            IConverterHelper converterHelper, IUserHelper userHelper, IImageHelper imageHelper)
         {
             _productRepository = productRepository;
+            _converterHelper = converterHelper;
+            _imageHelper = imageHelper;
             _userHelper = userHelper;
         }
 
@@ -62,12 +67,7 @@ namespace SuperShop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var path = await SaveImageFileAsync(productViewModel);
-
-                var product = ToProduct(productViewModel, path);
-
-                // TODO: Update user -> logged user
-                product.User = await _userHelper.GetUserByEmailAsync("dario@e.mail");
+                var product = await PrepareForCreateOrUpdate(productViewModel);
 
                 await _productRepository.CreateAsync(product);
 
@@ -90,7 +90,7 @@ namespace SuperShop.Web.Controllers
                 return NotFound();
             }
 
-            var productViewModel = ToProductViewModel(product);
+            var productViewModel = _converterHelper.ToProductViewModel(product);
 
             return View(productViewModel);
         }
@@ -106,9 +106,11 @@ namespace SuperShop.Web.Controllers
             {
                 try
                 {
-                    var path = await SaveImageFileAsync(productViewModel);
+                    var previousImageUrl = productViewModel.ImageUrl;
+                    var product = await PrepareForCreateOrUpdate(productViewModel);
 
-                    var product = ToProduct(productViewModel, path);
+                    if (string.IsNullOrEmpty(product.ImageUrl))
+                        product.ImageUrl = previousImageUrl;
 
                     await _productRepository.UpdateAsync(product);
                 }
@@ -160,25 +162,25 @@ namespace SuperShop.Web.Controllers
             return await _productRepository.ExistsAsync(id);
         }
 
-        static async Task<string> SaveImageFileAsync(ProductViewModel productViewModel)
+        async Task<Product> PrepareForCreateOrUpdate(ProductViewModel productViewModel)
         {
-            if (productViewModel.ImageFile == null || productViewModel.ImageFile.Length < 1)
-                return productViewModel.ImageUrl ?? string.Empty;
+            var imageUrl = await SaveImageFileAsync(productViewModel.ImageFile);
+            // TODO: Update user -> logged user
+            var user = await _userHelper.GetUserByEmailAsync("dario@e.mail");
 
-            var guid = Guid.NewGuid().ToString();
-            var file = $"{guid}.jpg";
-
-            var path = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot\\images\\products",
-                        file);
-
-            using (var stream = new FileStream(path, FileMode.Create))
+            return new Product(productViewModel)
             {
-                await productViewModel.ImageFile.CopyToAsync(stream);
-            }
+                ImageUrl = imageUrl,
+                User = user
+            };
+        }
 
-            return $"~/images/products/{file}";
+        async Task<string> SaveImageFileAsync(IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length < 1)
+                return string.Empty;
+
+            return await _imageHelper.UploadImageAsync(imageFile, "products");
         }
 
         static Func<Product, object> SortBy(string? param)
@@ -195,37 +197,5 @@ namespace SuperShop.Web.Controllers
             };
         }
 
-        static ProductViewModel ToProductViewModel(Product product)
-        {
-            return new()
-            {
-                Id = product.Id,
-                ImageUrl = product.ImageUrl,
-                IsAvailable = product.IsAvailable,
-                LastPurchase = product.LastPurchase,
-                LastSale = product.LastSale,
-                Name = product.Name,
-                Price = product.Price,
-                Stock = product.Stock,
-                User = product.User
-            };
-        }
-
-        static Product ToProduct(ProductViewModel productViewModel, string path)
-        {
-            //var p = (Product)productViewModel;
-            return new Product()
-            {
-                Id = productViewModel.Id,
-                ImageUrl = path,
-                IsAvailable = productViewModel.IsAvailable,
-                LastPurchase = productViewModel.LastPurchase,
-                LastSale = productViewModel.LastSale,
-                Name = productViewModel.Name,
-                Price = productViewModel.Price,
-                Stock = productViewModel.Stock,
-                User = productViewModel.User
-            };
-        }
     }
 }
