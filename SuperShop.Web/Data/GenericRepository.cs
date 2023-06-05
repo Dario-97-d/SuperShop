@@ -1,14 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SuperShop.Web.Data.Entities;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using SuperShop.Web.Data.Entities;
 
 namespace SuperShop.Web.Data
 {
-    public class GenericRepository<T>: IGenericRespository<T> where T : class, IEntity
+    public class GenericRepository<T> : IGenericRespository<T> where T : class, IEntity
     {
-        DataContext _context;
+        readonly DataContext _context;
 
         public GenericRepository(DataContext context)
         {
@@ -44,9 +43,9 @@ namespace SuperShop.Web.Data
             await SaveAllAsync();
         }
 
-        public async Task<bool> ExistsAsync(T entity)
+        public async Task<bool> ExistsAsync(int id)
         {
-            return await _context.Set<T>().AnyAsync(e => e == entity);
+            return await _context.Set<T>().AnyAsync(e => e.Id == id);
         }
 
         public async Task<bool> SaveAllAsync()

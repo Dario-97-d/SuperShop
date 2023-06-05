@@ -19,7 +19,7 @@ namespace SuperShop.Web.Data.Entities
         [DisplayFormat(DataFormatString = "{0:C2}", ApplyFormatInEditMode = false)]
         public decimal Price { get; set; }
 
-        
+
         [Display(Name = "Image")]
         public string ImageUrl { get; set; }
 
@@ -41,6 +41,9 @@ namespace SuperShop.Web.Data.Entities
 
 
         public User User { get; set; }
+
+        public string ImageFullPath =>
+            string.IsNullOrEmpty(ImageUrl) ? null : "https://localhost:44389/" + ImageUrl[1..];
 
     }
 }
