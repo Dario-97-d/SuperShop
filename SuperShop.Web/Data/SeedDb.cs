@@ -48,7 +48,8 @@ namespace SuperShop.Web.Data
                 Price = random.Next(50) + 50,
                 IsAvailable = true,
                 Stock = random.Next(50),
-                User = user
+                User = user,
+                ImageId = Guid.Empty
             });
         }
 
@@ -56,6 +57,7 @@ namespace SuperShop.Web.Data
         async Task<User> SetUser()
         {
             string defaultEmail = "dario@e.mail";
+            string password = defaultEmail;
 
             User user = await _userHelper.GetUserByEmailAsync(defaultEmail);
 
@@ -71,7 +73,7 @@ namespace SuperShop.Web.Data
                     PhoneNumber = "987654321"
                 };
 
-                var result = await _userHelper.AddUserAsync(user, "dario");
+                var result = await _userHelper.AddUserAsync(user, password);
 
                 if (!result.Succeeded)
                 {

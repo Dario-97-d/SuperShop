@@ -10,7 +10,7 @@ namespace SuperShop.Web.Helpers
             return new()
             {
                 Id = isNew ? 0 : pvm.Id,
-                ImageUrl = pvm.ImageUrl,
+                ImageId = pvm.ImageId,
                 IsAvailable = pvm.IsAvailable,
                 LastPurchase = pvm.LastPurchase,
                 LastSale = pvm.LastSale,
@@ -26,7 +26,7 @@ namespace SuperShop.Web.Helpers
             return new()
             {
                 Id = product.Id,
-                ImageUrl = product.ImageUrl,
+                ImageId = product.ImageId,
                 IsAvailable = product.IsAvailable,
                 LastPurchase = product.LastPurchase,
                 LastSale = product.LastSale,

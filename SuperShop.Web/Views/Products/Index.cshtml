@@ -21,7 +21,7 @@
                    class="fa fa-arrow-down">@Html.DisplayNameFor(model => model.Price)</a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
+                @Html.DisplayNameFor(model => model.ImageId)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LastPurchase)
@@ -49,10 +49,7 @@
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                @if (!string.IsNullOrEmpty(item.ImageUrl))
-                {
-                    <img src="@Url.Content(item.ImageUrl)" alt="Image" style="width:64px;max-width:100%;">
-                }
+                <img src="@Html.DisplayFor(modelItem => item.ImageFullPath)" alt="Image" style="max-width:32px;max-height:32px;">
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LastPurchase)

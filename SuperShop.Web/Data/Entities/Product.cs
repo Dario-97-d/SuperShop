@@ -21,10 +21,6 @@ namespace SuperShop.Web.Data.Entities
         public decimal Price { get; set; }
 
 
-        [Display(Name = "Image")]
-        public string ImageUrl { get; set; }
-
-
         [Display(Name = "Last Purchase")]
         public DateTime? LastPurchase { get; set; }
 
@@ -43,8 +39,13 @@ namespace SuperShop.Web.Data.Entities
 
         public User User { get; set; }
 
-        public string ImageFullPath =>
-            string.IsNullOrEmpty(ImageUrl) ? null : "https://localhost:44389/" + ImageUrl[1..];
+
+        [Display(Name = "Image")]
+        public Guid ImageId { get; set; }
+
+        public string ImageFullPath => ImageId == Guid.Empty ?
+            "https://myleasing.azurewebsites.net/images/no_image_icon.png" :
+            "https://myleasingdariostorage.blob.core.windows.net/products/" + ImageId;
 
 
         public Product()
@@ -55,7 +56,7 @@ namespace SuperShop.Web.Data.Entities
         public Product(ProductViewModel pvm)
         {
             Id = pvm.Id;
-            ImageUrl = pvm.ImageUrl;
+            ImageId = pvm.ImageId;
             IsAvailable = pvm.IsAvailable;
             LastPurchase = pvm.LastPurchase;
             LastSale = pvm.LastSale;

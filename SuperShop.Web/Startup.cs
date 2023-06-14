@@ -41,8 +41,8 @@ namespace SuperShop.Web
             });
 
             services.AddTransient<SeedDb>();
+            services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
-            services.AddScoped<IImageHelper, ImageHelper>();
             services.AddScoped<IUserHelper, UserHelper>();
             services.AddScoped<IProductRepository, ProductRepository>();
 
@@ -67,6 +67,7 @@ namespace SuperShop.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

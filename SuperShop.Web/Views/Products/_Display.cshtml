@@ -1,0 +1,48 @@
+﻿@model SuperShop.Web.Data.Entities.Product
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-6">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt class="col-sm-6">
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <dt class="col-sm-6">
+                @Html.DisplayNameFor(model => model.LastPurchase)
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.LastPurchase)
+            </dd>
+            <dt class="col-sm-6">
+                @Html.DisplayNameFor(model => model.LastSale)
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.LastSale)
+            </dd>
+            <dt class="col-sm-6">
+                @Html.DisplayNameFor(model => model.IsAvailable)
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.IsAvailable)
+            </dd>
+            <dt class="col-sm-6">
+                @Html.DisplayNameFor(model => model.Stock)
+            </dt>
+            <dd class="col-sm-6">
+                @Html.DisplayFor(model => model.Stock)
+            </dd>
+        </dl>
+    </div>
+
+    <div class="col-md-6">
+        <img src="@Model.ImageFullPath" alt="Image" style="max-width:128px;max-height:128px;" />
+    </div>
+</div>

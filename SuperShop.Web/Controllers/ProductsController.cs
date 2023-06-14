@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,17 +14,21 @@ namespace SuperShop.Web.Controllers
 {
     public class ProductsController : Controller
     {
+        // Repository
         readonly IProductRepository _productRepository;
+
+        // Helpers
+
+        readonly IBlobHelper _blobHelper;
         readonly IConverterHelper _converterHelper;
-        readonly IImageHelper _imageHelper;
         readonly IUserHelper _userHelper;
 
         public ProductsController(IProductRepository productRepository,
-            IConverterHelper converterHelper, IUserHelper userHelper, IImageHelper imageHelper)
+            IBlobHelper blobHelper, IConverterHelper converterHelper, IUserHelper userHelper)
         {
             _productRepository = productRepository;
             _converterHelper = converterHelper;
-            _imageHelper = imageHelper;
+            _blobHelper = blobHelper;
             _userHelper = userHelper;
         }
 
@@ -53,6 +58,7 @@ namespace SuperShop.Web.Controllers
         }
 
         // GET: Products/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -61,6 +67,7 @@ namespace SuperShop.Web.Controllers
         // POST: Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductViewModel productViewModel)
@@ -77,6 +84,7 @@ namespace SuperShop.Web.Controllers
         }
 
         // GET: Products/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -98,6 +106,7 @@ namespace SuperShop.Web.Controllers
         // POST: Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ProductViewModel productViewModel)
@@ -106,11 +115,7 @@ namespace SuperShop.Web.Controllers
             {
                 try
                 {
-                    var previousImageUrl = productViewModel.ImageUrl;
                     var product = await PrepareForCreateOrUpdate(productViewModel);
-
-                    if (string.IsNullOrEmpty(product.ImageUrl))
-                        product.ImageUrl = previousImageUrl;
 
                     await _productRepository.UpdateAsync(product);
                 }
@@ -131,6 +136,7 @@ namespace SuperShop.Web.Controllers
         }
 
         // GET: Products/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -148,6 +154,7 @@ namespace SuperShop.Web.Controllers
         }
 
         // POST: Products/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -164,23 +171,23 @@ namespace SuperShop.Web.Controllers
 
         async Task<Product> PrepareForCreateOrUpdate(ProductViewModel productViewModel)
         {
-            var imageUrl = await SaveImageFileAsync(productViewModel.ImageFile);
+            var imageId = await SaveImageFileAsync(productViewModel.ImageFile);
             // TODO: Update user -> logged user
             var user = await _userHelper.GetUserByEmailAsync("dario@e.mail");
 
             return new Product(productViewModel)
             {
-                ImageUrl = imageUrl,
+                ImageId = imageId,
                 User = user
             };
         }
 
-        async Task<string> SaveImageFileAsync(IFormFile imageFile)
+        async Task<Guid> SaveImageFileAsync(IFormFile imageFile)
         {
             if (imageFile == null || imageFile.Length < 1)
-                return string.Empty;
+                return Guid.Empty;
 
-            return await _imageHelper.UploadImageAsync(imageFile, "products");
+            return await _blobHelper.UploadBlobAsync(imageFile, "products");
         }
 
         static Func<Product, object> SortBy(string? param)
