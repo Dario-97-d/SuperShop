@@ -24,6 +24,9 @@ namespace SuperShop.Web.Data
         {
             await _context.Database.EnsureCreatedAsync();
 
+            await _userHelper.CheckRoleAsync("Admin");
+            await _userHelper.CheckRoleAsync("Customer");
+
             var user = await SetUser();
 
             if (!_context.Products.Any())
@@ -82,6 +85,14 @@ namespace SuperShop.Web.Data
                         "\n" + result.Errors
                         );
                 }
+
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+            var isInRole = await _userHelper.IsInRoleAsync(user, "Admin");
+            if (!isInRole)
+            {
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
             return user;

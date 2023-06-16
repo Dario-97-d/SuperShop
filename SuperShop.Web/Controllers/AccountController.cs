@@ -17,6 +17,7 @@ namespace SuperShop.Web.Controllers
             _userHelper = userHelper;
         }
 
+
         public IActionResult Login()
         {
             if (User.Identity.IsAuthenticated)
@@ -26,6 +27,7 @@ namespace SuperShop.Web.Controllers
 
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -48,6 +50,7 @@ namespace SuperShop.Web.Controllers
             return View(model);
         }
 
+
         public async Task<IActionResult> Logout()
         {
             await _userHelper.LogoutAsync();
@@ -55,10 +58,12 @@ namespace SuperShop.Web.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+
         public IActionResult Register()
         {
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
@@ -93,6 +98,8 @@ namespace SuperShop.Web.Controllers
                     return View(model);
                 }
 
+                await _userHelper.AddUserToRoleAsync(user, "Customer");
+
                 // Preparing automatic login
 
                 var login = new LoginViewModel
@@ -120,6 +127,7 @@ namespace SuperShop.Web.Controllers
             return View(model);
         }
 
+
         [Authorize]
         public async Task<IActionResult> ChangeUser()
         {
@@ -141,6 +149,7 @@ namespace SuperShop.Web.Controllers
 
             return View(model);
         }
+
 
         [Authorize]
         [HttpPost]
@@ -179,14 +188,15 @@ namespace SuperShop.Web.Controllers
             return View(model);
         }
 
+
         public IActionResult ChangePassword()
         {
             return View();
         }
 
-        [ActionName("ChangePassword")]
+
         [Authorize]
-        [HttpPost]
+        [HttpPost, ActionName("ChangePassword")]
         public async Task<IActionResult> ChangePasswordAsync(ChangePasswordViewModel model)
         {
             // Getting user
