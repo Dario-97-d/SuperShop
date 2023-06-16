@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperShop.Web.Data.Entities;
 using SuperShop.Web.Helpers;
@@ -115,6 +116,100 @@ namespace SuperShop.Web.Controllers
             }
 
             // !ModelState.IsValid
+
+            return View(model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ChangeUser()
+        {
+            ViewBag.UserMessage = TempData["UserMessage"] ?? "";
+
+            // Getting user
+
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = new ChangeUserViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        {
+            // Getting user
+
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Getting new user values
+
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+
+                // Updating user
+
+                var result = await _userHelper.UpdateUserAsync(user);
+                if (result.Succeeded)
+                {
+                    ViewBag.UserMessage = "User updated!";
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                }
+
+                return View(model);
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [ActionName("ChangePassword")]
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePasswordAsync(ChangePasswordViewModel model)
+        {
+            // Getting user
+
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    TempData["UserMessage"] = "Password changed.";
+                    return RedirectToAction(nameof(ChangeUser));
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                }
+            }
 
             return View(model);
         }

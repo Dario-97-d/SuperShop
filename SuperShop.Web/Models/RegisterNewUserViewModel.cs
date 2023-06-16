@@ -6,12 +6,12 @@ namespace SuperShop.Web.Models
     public class RegisterNewUserViewModel
     {
         [Required]
-        [DisplayName("First Name")]
+        [DisplayName("First name")]
         public string FirstName { get; set; }
 
 
         [Required]
-        [DisplayName("Last Name")]
+        [DisplayName("Last name")]
         public string LastName { get; set; }
 
 
