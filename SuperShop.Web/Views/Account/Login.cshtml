@@ -37,7 +37,7 @@
             <!-- Submit __ Register -->
             <div class="form-group">
                 <input type="submit" class="btn btn-success" value="Login" />
-                <a asp-action="Register" class="btn btn-primary">Register</a>
+                <a asp-action="Register" asp-route-ReturnUrl="@Context.Request.Query["ReturnUrl"]" class="btn btn-primary">Register</a>
             </div>
         </form>
     </div>

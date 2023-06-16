@@ -1,0 +1,56 @@
+﻿@model SuperShop.Web.Models.RegisterNewUserViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>Register</h2>
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <form method="POST">
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <!-- First Name -->
+            <div class="form-group">
+                <label asp-for="FirstName">FirstName</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group">
+                <label asp-for="LastName">LastName</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <!-- Username -->
+            <div class="form-group">
+                <label asp-for="Username">Username</label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label asp-for="Confirm">Confirm</label>
+                <input asp-for="Confirm" type="password" class="form-control" />
+                <span asp-validation-for="Confirm" class="text-danger"></span>
+            </div>
+
+
+            <!-- Register Button -->
+            <div class="form-group">
+                <input type="submit" value="Register New User" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

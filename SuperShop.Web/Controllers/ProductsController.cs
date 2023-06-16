@@ -172,8 +172,8 @@ namespace SuperShop.Web.Controllers
         async Task<Product> PrepareForCreateOrUpdate(ProductViewModel productViewModel)
         {
             var imageId = await SaveImageFileAsync(productViewModel.ImageFile);
-            // TODO: Update user -> logged user
-            var user = await _userHelper.GetUserByEmailAsync("dario@e.mail");
+            
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
 
             return new Product(productViewModel)
             {
