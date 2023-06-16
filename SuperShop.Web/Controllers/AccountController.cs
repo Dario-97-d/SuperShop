@@ -29,8 +29,8 @@ namespace SuperShop.Web.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        [HttpPost, ActionName("Login")]
+        public async Task<IActionResult> LoginAsync(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -51,7 +51,8 @@ namespace SuperShop.Web.Controllers
         }
 
 
-        public async Task<IActionResult> Logout()
+        [ActionName("Logout")]
+        public async Task<IActionResult> LogoutAsync()
         {
             await _userHelper.LogoutAsync();
 
@@ -65,8 +66,8 @@ namespace SuperShop.Web.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterNewUserViewModel model)
+        [HttpPost, ActionName("Register")]
+        public async Task<IActionResult> RegisterAsync(RegisterNewUserViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -109,7 +110,7 @@ namespace SuperShop.Web.Controllers
                     RememberMe = false
                 };
 
-                return await Login(login);
+                return await LoginAsync(login);
 
                 //var resultLogin = await _userHelper.LoginAsync(login);
                 //if (!resultLogin.Succeeded)
@@ -129,7 +130,8 @@ namespace SuperShop.Web.Controllers
 
 
         [Authorize]
-        public async Task<IActionResult> ChangeUser()
+        [ActionName("ChangeUser")]
+        public async Task<IActionResult> ChangeUserAsync()
         {
             ViewBag.UserMessage = TempData["UserMessage"] ?? "";
 
@@ -152,8 +154,8 @@ namespace SuperShop.Web.Controllers
 
 
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        [HttpPost, ActionName("ChangeUser")]
+        public async Task<IActionResult> ChangeUserAsync(ChangeUserViewModel model)
         {
             // Getting user
 
@@ -213,7 +215,7 @@ namespace SuperShop.Web.Controllers
                 if (result.Succeeded)
                 {
                     TempData["UserMessage"] = "Password changed.";
-                    return RedirectToAction(nameof(ChangeUser));
+                    return RedirectToAction(nameof(ChangeUserAsync));
                 }
                 else
                 {
@@ -222,6 +224,14 @@ namespace SuperShop.Web.Controllers
             }
 
             return View(model);
+        }
+
+
+        public IActionResult NotAuthorized()
+        {
+            // Startup.ConfigureServices():
+            //  services.ConfigureAplicationCookie(options.+Path = NotAuthorized())
+            return View();
         }
     }
 }
