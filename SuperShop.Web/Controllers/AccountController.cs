@@ -88,9 +88,7 @@ namespace SuperShop.Web.Controllers
                     LastName = model.LastName,
                     Email = model.Username,
                     UserName = model.Username
-                };
-
-                await _userHelper.AddUserToRoleAsync(user, "Customer");
+                };                
 
                 // Creating user
 
@@ -100,6 +98,8 @@ namespace SuperShop.Web.Controllers
                     ModelState.AddModelError(string.Empty, "Could not create User.");
                     return View(model);
                 }
+
+                await _userHelper.AddUserToRoleAsync(user, "Customer");
 
                 // Preparing automatic login
 

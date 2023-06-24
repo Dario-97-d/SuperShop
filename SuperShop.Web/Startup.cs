@@ -41,9 +41,14 @@ namespace SuperShop.Web
             });
 
             services.AddTransient<SeedDb>();
+
+            // Add Helpers
             services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<IUserHelper, UserHelper>();
+
+            // Add Repositories
+            services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
 
             services.ConfigureApplicationCookie(options =>

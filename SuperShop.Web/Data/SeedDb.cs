@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Helpers;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using SuperShop.Web.Data.Entities;
+using SuperShop.Web.Helpers;
 
 namespace SuperShop.Web.Data
 {
@@ -22,12 +22,12 @@ namespace SuperShop.Web.Data
 
         public async Task SeedAsync()
         {
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.MigrateAsync();
 
             await _userHelper.CheckRoleAsync("Admin");
             await _userHelper.CheckRoleAsync("Customer");
 
-            var user = await SetUser();
+            var user = await DefineUser();
 
             if (!_context.Products.Any())
             {
@@ -57,7 +57,7 @@ namespace SuperShop.Web.Data
         }
 
 
-        async Task<User> SetUser()
+        async Task<User> DefineUser()
         {
             string defaultEmail = "dario@e.mail";
             string password = defaultEmail;
