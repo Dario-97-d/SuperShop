@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data.Entities;
@@ -21,13 +22,13 @@ namespace SuperShop.Web.Data
             return _context.Products.Include(p => p.User);
         }
 
-        public IEnumerable<SelectListItem> GetComboProducts()
+        public async Task<IEnumerable<SelectListItem>> GetComboProductsAsync()
         {
-            var list = _context.Products.Select(p => new SelectListItem
+            var list = await _context.Products.Select(p => new SelectListItem
             {
                 Text = p.Name,
                 Value = p.Id.ToString()
-            }).ToList();
+            }).ToListAsync();
 
             list.Insert(0, new SelectListItem
             {

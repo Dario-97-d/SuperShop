@@ -8,6 +8,7 @@ namespace SuperShop.Web.Data
     public interface IOrderRepository
     {
         Task AddItemToOrderAsync(AddItemViewModel model, string userName);
+        Task<bool> ConfirmOrderAsync(string userName);
         Task DeleteDetailTempAsync(int id);
         Task<IQueryable<OrderDetailTemp>> GetOrderDetailsTempAsync(string userName);
         Task<IQueryable<Order>> GetOrdersAsync(string userName);

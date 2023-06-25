@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data.Entities;
@@ -31,16 +32,16 @@ namespace SuperShop.Web.Data
 
             var product = await _context.Products.FindAsync(model.ProductId);
             if (product == null) return;
-            
 
-            // Get Order Detail of Product from Temporary Order Details
+
+            // Get Temporary Order Detail of Product
 
             var orderDetailTemp = await _context.OrderDetailsTemp
                 .Where(odt => odt.User.Id == user.Id && odt.Product.Id == product.Id)
                 .FirstOrDefaultAsync();
 
 
-            // Check Order Detail from Temporary Order Details exists
+            // Check Temporary Order Details exists
 
             if (orderDetailTemp == null)
             {
@@ -67,6 +68,55 @@ namespace SuperShop.Web.Data
             await base.SaveAsync();
         }
 
+        public async Task<bool> ConfirmOrderAsync(string userName)
+        {
+            // Get User
+
+            var user = await _userHelper.GetUserByEmailAsync(userName);
+            if (user == null) return false;
+
+            // Get Temporary Order Details
+
+            var orderDetailsTemp = await _context.OrderDetailsTemp
+                .Where(odt => odt.User.Id == user.Id)
+                .Include(odt => odt.Product)
+                .ToListAsync();
+
+            // Check Temporary Order Details is null or empty
+
+            if (orderDetailsTemp == null || orderDetailsTemp.Count == 0)
+                return false;
+
+            // Define Order Details for new Order from Temporary Order Details
+
+            var orderDetails = orderDetailsTemp.Select(odt => new OrderDetail
+            {
+                Product = odt.Product,
+                Price = odt.Price,
+                Quantity = odt.Quantity
+            }).ToList();
+
+            // Define Order
+
+            var order = new Order
+            {
+                User = user,
+                OrderDate = DateTime.UtcNow,
+                Items = orderDetails
+            };
+
+            // Create Order and Remove Temporary Order Details
+
+            await base.CreateAsync(order);
+            _context.OrderDetailsTemp.RemoveRange(orderDetailsTemp);
+
+            // Save changes
+
+            await base.SaveAsync();
+            
+            return true;
+        }
+
         public async Task DeleteDetailTempAsync(int id)
         {
             var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id);
@@ -74,20 +124,6 @@ namespace SuperShop.Web.Data
 
             _context.OrderDetailsTemp.Remove(orderDetailTemp);
             await base.SaveAsync();
-        }
-
-        public async Task ModifyOrderDetailTempQuantityAsync(int id, double quantity)
-        {
-            var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id);
-            if (orderDetailTemp == null)
-                return;
-
-            orderDetailTemp.Quantity += quantity;
-            if (orderDetailTemp.Quantity > 0)
-            {
-                _context.OrderDetailsTemp.Update(orderDetailTemp);
-                await base.SaveAsync();
-            }
         }
 
         public async Task<IQueryable<OrderDetailTemp>> GetOrderDetailsTempAsync(string userName)
@@ -114,6 +150,7 @@ namespace SuperShop.Web.Data
                 return _context.Orders
                     .AsNoTracking()
                     .OrderByDescending(o => o.OrderDate)
+                    .Include(o => o.User)
                     .Include(o => o.Items)
                     .ThenInclude(i => i.Product);
             }
@@ -125,6 +162,20 @@ namespace SuperShop.Web.Data
                     .OrderByDescending(o => o.OrderDate)
                     .Include(o => o.Items)
                     .ThenInclude(i => i.Product);
+            }
+        }
+
+        public async Task ModifyOrderDetailTempQuantityAsync(int id, double quantity)
+        {
+            var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id);
+            if (orderDetailTemp == null)
+                return;
+
+            orderDetailTemp.Quantity += quantity;
+            if (orderDetailTemp.Quantity > 0)
+            {
+                _context.OrderDetailsTemp.Update(orderDetailTemp);
+                await base.SaveAsync();
             }
         }
     }

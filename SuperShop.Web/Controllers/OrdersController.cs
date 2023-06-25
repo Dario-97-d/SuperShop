@@ -25,11 +25,11 @@ namespace SuperShop.Web.Controllers
             return View(model);
         }
 
-        public IActionResult AddProduct()
+        public async Task<IActionResult> AddProduct()
         {
             var model = new AddItemViewModel
             {
-                Products = _productRepository.GetComboProducts(),
+                Products = await _productRepository.GetComboProductsAsync(),
                 Quantity = 1
             };
             return View(model);
@@ -46,6 +46,18 @@ namespace SuperShop.Web.Controllers
 
             ModelState.AddModelError(string.Empty, "Could not add Product.");
             return View(model);
+        }
+
+        public async Task<IActionResult> ConfirmOrder()
+        {
+            var success = await _orderRepository.ConfirmOrderAsync(User.Identity.Name);
+
+            if (success)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return RedirectToAction(nameof(Create));
         }
 
         public async Task<IActionResult> Create()

@@ -28,10 +28,12 @@ namespace SuperShop.Web.Data.Entities
         [Required]
         [Display(Name = "Delivery date")]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)]
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
 
 
         public IEnumerable<OrderDetail> Items { get; set; }
+
+        public int Lines => Items == null ? 0 : Items.Count();
 
 
         [DisplayFormat(DataFormatString = "{0:N2}")]
@@ -40,5 +42,15 @@ namespace SuperShop.Web.Data.Entities
 
         [DisplayFormat(DataFormatString = "{0:N2}")]
         public decimal Value => Items == null ? 0 : Items.Sum(i => i.Value);
+
+
+        [Display(Name = "Order date")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)]
+        public DateTime? OrderDateLocal => OrderDate.ToLocalTime();
+
+
+        [Display(Name = "Delivery date")]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)]
+        public DateTime? DeliveryDateLocal => DeliveryDate?.ToLocalTime();
     }
 }
