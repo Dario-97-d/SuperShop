@@ -67,6 +67,15 @@ namespace SuperShop.Web.Data
             await base.SaveAsync();
         }
 
+        public async Task DeleteDetailTempAsync(int id)
+        {
+            var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id);
+            if (orderDetailTemp == null) return;
+
+            _context.OrderDetailsTemp.Remove(orderDetailTemp);
+            await base.SaveAsync();
+        }
+
         public async Task ModifyOrderDetailTempQuantityAsync(int id, double quantity)
         {
             var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id);

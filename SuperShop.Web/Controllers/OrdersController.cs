@@ -25,12 +25,6 @@ namespace SuperShop.Web.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Create()
-        {
-            var model = await _orderRepository.GetOrderDetailsTempAsync(User.Identity.Name);
-            return View(model);
-        }
-
         public IActionResult AddProduct()
         {
             var model = new AddItemViewModel
@@ -52,6 +46,36 @@ namespace SuperShop.Web.Controllers
 
             ModelState.AddModelError(string.Empty, "Could not add Product.");
             return View(model);
+        }
+
+        public async Task<IActionResult> Create()
+        {
+            var model = await _orderRepository.GetOrderDetailsTempAsync(User.Identity.Name);
+            return View(model);
+        }
+
+        public async Task<IActionResult> Decrement(int? id)
+        {
+            if (id == null) return NotFound();
+
+            await _orderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, -1);
+            return RedirectToAction(nameof(Create));
+        }
+
+        public async Task<IActionResult> DeleteItem(int? id)
+        {
+            if (id == null) return NotFound();
+
+            await _orderRepository.DeleteDetailTempAsync(id.Value);
+            return RedirectToAction(nameof(Create));
+        }
+
+        public async Task<IActionResult> Increment(int? id)
+        {
+            if (id == null) return NotFound();
+
+            await _orderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, 1);
+            return RedirectToAction(nameof(Create));
         }
     }
 }
