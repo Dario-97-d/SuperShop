@@ -28,19 +28,19 @@ namespace SuperShop.Web.Data
         public async Task CreateAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
-            await SaveAllAsync();
+            await SaveAsync();
         }
 
         public async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
-            await SaveAllAsync();
+            await SaveAsync();
         }
 
         public async Task DeleteAsync(T entity)
         {
             _context.Set<T>().Remove(entity);
-            await SaveAllAsync();
+            await SaveAsync();
         }
 
         public async Task<bool> ExistsAsync(int id)
@@ -48,7 +48,7 @@ namespace SuperShop.Web.Data
             return await _context.Set<T>().AnyAsync(e => e.Id == id);
         }
 
-        public async Task<bool> SaveAllAsync()
+        public async Task<bool> SaveAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }
