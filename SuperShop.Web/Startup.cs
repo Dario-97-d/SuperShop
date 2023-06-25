@@ -54,7 +54,6 @@ namespace SuperShop.Web
             services.ConfigureApplicationCookie(options =>
             {
                 options.AccessDeniedPath = "/Account/NotAuthorized";
-                options.LoginPath = "/Account/NotAuthorized";
             });
             
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
