@@ -160,8 +160,29 @@ namespace SuperShop.Web.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            await _productRepository.DeleteAsync(product);
-            return RedirectToAction(nameof(Index));
+
+            try
+            {
+                await _productRepository.DeleteAsync(product);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException?.Message.Contains("DELETE") ?? false)
+                {
+                    ViewBag.ErrorTitle = $"Cannot delete this {nameof(Product)}";
+                    ViewBag.ErrorMessage =
+                        $"This {product.Name} is included in some object relationship." +
+                        $" Check and clear any relationships with this {product.Name} and try again." +
+                        $"<br />" +
+                        $"<br />" +
+                        $"Possible relationships include those with:" +
+                        $"<br />" +
+                        $"- {nameof(Order)}s";
+                }
+                
+                return View("Error");
+            }
         }
 
         private async Task<bool> ProductExists(int id)
