@@ -82,6 +82,38 @@ namespace SuperShop.Web.Controllers
             return RedirectToAction(nameof(Create));
         }
 
+        public async Task<IActionResult> Deliver(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var order = await _orderRepository.GetOrderAsync(id.Value);
+            if (order == null)
+                return NotFound();
+
+            var model = new DeliveryViewModel
+            {
+                Id = order.Id,
+                DeliveryDate = System.DateTime.Today
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Deliver(DeliveryViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _orderRepository.DeliverOrder(model);
+                TempData["UserMessage"] = "Delivered.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ModelState.AddModelError(string.Empty, "Could not deliver order.");
+            return View(model);
+        }
+
         public async Task<IActionResult> Increment(int? id)
         {
             if (id == null) return NotFound();

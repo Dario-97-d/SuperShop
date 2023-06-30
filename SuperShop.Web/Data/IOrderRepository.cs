@@ -10,6 +10,8 @@ namespace SuperShop.Web.Data
         Task AddItemToOrderAsync(AddItemViewModel model, string userName);
         Task<bool> ConfirmOrderAsync(string userName);
         Task DeleteDetailTempAsync(int id);
+        Task DeliverOrder(DeliveryViewModel model);
+        Task<Order> GetOrderAsync(int id);
         Task<IQueryable<OrderDetailTemp>> GetOrderDetailsTempAsync(string userName);
         Task<IQueryable<Order>> GetOrdersAsync(string userName);
         Task ModifyOrderDetailTempQuantityAsync(int id, double quantity);
