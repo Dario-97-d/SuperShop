@@ -16,7 +16,7 @@
         id="input-file-image" class="form-control" onchange="showPreview(event);" />
     <span asp-validation-for="ImageFile" class="text-danger"></span>
 </div>
-<script>    
+<script>
     const showPreview = event => {
         const divImageFile = document.getElementById("input-file-image");
         const divId = "div-img-preview";
