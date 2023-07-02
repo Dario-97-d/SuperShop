@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,9 @@ namespace SuperShop.Web.Data
             await _userHelper.CheckRoleAsync("Admin");
             await _userHelper.CheckRoleAsync("Customer");
 
-            var user = await DefineUser();
+            await SeedCountriesAndCities();
+
+            var user = await SeedUser();
 
             if (!_context.Products.Any())
             {
@@ -56,8 +59,22 @@ namespace SuperShop.Web.Data
             });
         }
 
+        async Task SeedCountriesAndCities()
+        {
+            if (!await _context.Countries.AnyAsync())
+            {
+                var country = (await _context.Countries.AddAsync(new Country { Name = "Portugal" })).Entity;
+                country.Cities = new List<City>
+                {
+                    new City { Name = "Porto" },
+                    new City { Name = "Lisboa" }
+                };
 
-        async Task<User> DefineUser()
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        async Task<User> SeedUser()
         {
             string defaultEmail = "dario@e.mail";
             string password = defaultEmail;
@@ -67,13 +84,18 @@ namespace SuperShop.Web.Data
             // If user doesn't exist, create it
             if (user == null)
             {
+                var city = _context.Countries.FirstOrDefault().Cities.FirstOrDefault();
+
                 user = new()
                 {
                     FirstName = "Dário",
                     LastName = "d97",
                     UserName = defaultEmail,
                     Email = defaultEmail,
-                    PhoneNumber = "987654321"
+                    PhoneNumber = "987654321",
+                    Address = "Casa na rua",
+                    City = city,
+                    CityId = city.Id
                 };
 
                 var result = await _userHelper.AddUserAsync(user, password);

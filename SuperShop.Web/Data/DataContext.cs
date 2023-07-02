@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data.Entities;
 
@@ -7,6 +6,11 @@ namespace SuperShop.Web.Data
 {
     public class DataContext : IdentityDbContext<User>
     {
+        // Countries and Cities
+
+        public DbSet<City> Cities { get; set; }
+        public DbSet<Country> Countries { get; set; }
+
         // Orders
 
         public DbSet<Order> Orders { get; set; }
@@ -22,6 +26,7 @@ namespace SuperShop.Web.Data
         {
 
         }
+
 
         // Cascade delete
         //

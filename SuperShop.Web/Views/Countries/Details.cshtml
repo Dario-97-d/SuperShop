@@ -1,0 +1,48 @@
+﻿@model SuperShop.Web.Data.Entities.Country
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<h4>@Html.DisplayFor(model => model.Name)</h4>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<p>
+    <a asp-action="AddCity" asp-route-countryId="@Model.Id">Add city</a>
+</p>
+@if (Model.Cities == null || Model.Cities.Count == 0)
+{
+    <h5>No cities yet.</h5>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cities)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Cities)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        <a asp-action="EditCity" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="DeleteCity" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

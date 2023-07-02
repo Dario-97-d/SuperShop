@@ -48,6 +48,7 @@ namespace SuperShop.Web
             services.AddScoped<IUserHelper, UserHelper>();
 
             // Add Repositories
+            services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
 

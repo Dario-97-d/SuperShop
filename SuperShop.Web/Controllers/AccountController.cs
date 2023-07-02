@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
 using SuperShop.Web.Helpers;
 using SuperShop.Web.Models;
@@ -11,10 +14,12 @@ namespace SuperShop.Web.Controllers
     public class AccountController : Controller
     {
         private readonly IUserHelper _userHelper;
+        private readonly ICountryRepository _countryRepository;
 
-        public AccountController(IUserHelper userHelper)
+        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository)
         {
             _userHelper = userHelper;
+            _countryRepository = countryRepository;
         }
 
 
@@ -60,9 +65,14 @@ namespace SuperShop.Web.Controllers
         }
 
 
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            return View();
+            var model = new RegisterNewUserViewModel
+            {
+                Countries = await _countryRepository.GetComboCountriesAsync(),
+                Cities = await _countryRepository.GetComboCitiesOfCountryAsync(0)
+            };
+            return View(model);
         }
 
 
@@ -80,6 +90,15 @@ namespace SuperShop.Web.Controllers
                     return View(model);
                 }
 
+                // Check City
+
+                var city = await _countryRepository.GetCityAsync(model.CityId);
+                if (city == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid city.");
+                    return View(model);
+                }
+
                 // Converting RegisterViewModel to User
 
                 user = new User
@@ -87,7 +106,10 @@ namespace SuperShop.Web.Controllers
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Email = model.Username,
-                    UserName = model.Username
+                    UserName = model.Username,
+                    Address = model.Address,
+                    CityId = model.CityId,
+                    City = city,
                 };                
 
                 // Creating user
@@ -138,18 +160,26 @@ namespace SuperShop.Web.Controllers
             // Getting user
 
             var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
-            if (user == null)
+            if (user != null)
             {
-                return RedirectToAction("Index", "Home");
+                var country = await _countryRepository.GetCountryOfCityAsync(user.CityId);
+                var countryId = country?.Id ?? 0;
+
+                var model = new ChangeUserViewModel
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Address = user.Address,
+                    CountryId = countryId,
+                    Countries = await _countryRepository.GetComboCountriesAsync(),
+                    CityId = user.CityId,
+                    Cities = await _countryRepository.GetComboCitiesOfCountryAsync(countryId),
+                };
+
+                return View(model);
             }
 
-            var model = new ChangeUserViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName
-            };
-
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
 
 
@@ -157,34 +187,48 @@ namespace SuperShop.Web.Controllers
         [HttpPost, ActionName("ChangeUser")]
         public async Task<IActionResult> ChangeUserAsync(ChangeUserViewModel model)
         {
-            // Getting user
-
-            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
-            if (user == null)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
             if (ModelState.IsValid)
             {
-                // Getting new user values
+                // Getting user
 
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-
-                // Updating user
-
-                var result = await _userHelper.UpdateUserAsync(user);
-                if (result.Succeeded)
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                if (user == null)
                 {
-                    ViewBag.UserMessage = "User updated!";
+                    return RedirectToAction("Index", "Home");
+                }
+
+                var city = await _countryRepository.GetCityAsync(user.CityId);
+                if (city == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Could not find City.");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
-                }
+                    // Getting new user values
 
-                return View(model);
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.Address = model.Address;
+                    user.CityId = model.CityId;
+                    user.City = city;
+
+                    // Updating user
+
+                    var updateUser = await _userHelper.UpdateUserAsync(user);
+                    if (updateUser.Succeeded)
+                    {
+                        ViewBag.UserMessage = "User updated!";
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, updateUser.Errors.FirstOrDefault().Description);
+                    }
+
+                    // Reset model's Countries' and Cities' lists
+                    // because POST doesn't bring them through
+                    model.Countries = await _countryRepository.GetComboCountriesAsync();
+                    model.Cities = await _countryRepository.GetComboCitiesOfCountryAsync(model.CountryId);
+                }
             }
 
             return View(model);
@@ -226,6 +270,14 @@ namespace SuperShop.Web.Controllers
             return View(model);
         }
 
+
+        [HttpPost]
+        [Route("Account/GetCitiesOfCountryAsync")]
+        public async Task<JsonResult> GetCitiesOfCountryAsync(int countryId)
+        {
+            var country = await _countryRepository.GetCountryWithCitiesAsync(countryId);
+            return Json(country.Cities.OrderBy(c => c.Name));
+        }
 
         public IActionResult NotAuthorized()
         {
