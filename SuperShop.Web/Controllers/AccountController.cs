@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
 using SuperShop.Web.Helpers;
@@ -13,11 +17,13 @@ namespace SuperShop.Web.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly IConfiguration _configuration;
         private readonly IUserHelper _userHelper;
         private readonly ICountryRepository _countryRepository;
 
-        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository)
+        public AccountController(IConfiguration configuration, IUserHelper userHelper, ICountryRepository countryRepository)
         {
+            _configuration = configuration;
             _userHelper = userHelper;
             _countryRepository = countryRepository;
         }
@@ -110,7 +116,7 @@ namespace SuperShop.Web.Controllers
                     Address = model.Address,
                     CityId = model.CityId,
                     City = city,
-                };                
+                };
 
                 // Creating user
 
@@ -268,6 +274,53 @@ namespace SuperShop.Web.Controllers
             }
 
             return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateToken([FromBody]LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Username);
+                if (user != null)
+                {
+                    var validatePassword = await _userHelper
+                        .ValidatePasswordAsync(user, model.Password);
+
+                    if (validatePassword.Succeeded)
+                    {
+                        var claims = new[]
+                        {
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        };
+
+                        var key = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+
+                        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                        var token = new JwtSecurityToken(
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
+                            claims,
+                            expires: DateTime.UtcNow.AddDays(15),
+                            signingCredentials: credentials
+                            );
+
+                        var results = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo
+                        };
+
+                        return Created(string.Empty, results);
+                    }
+                }
+            }
+
+            return BadRequest();
         }
 
 

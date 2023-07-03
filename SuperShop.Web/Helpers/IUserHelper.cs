@@ -16,5 +16,6 @@ namespace SuperShop.Web.Helpers
         Task<SignInResult> LoginAsync(LoginViewModel viewModel);
         Task LogoutAsync();
         Task<IdentityResult> UpdateUserAsync(User user);
+        Task<SignInResult> ValidatePasswordAsync(User user, string password);
     }
 }
