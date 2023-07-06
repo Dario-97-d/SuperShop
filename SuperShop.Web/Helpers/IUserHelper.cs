@@ -11,7 +11,10 @@ namespace SuperShop.Web.Helpers
         Task AddUserToRoleAsync(User user, string roleName);
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
         Task CheckRoleAsync(string roleName);
+        Task<IdentityResult> ConfirmEmailAsync(User user, string token);
+        Task<string> GenerateEmailConfirmationTokenAsync(User user);
         Task<User> GetUserByEmailAsync(string email);
+        Task<User> GetUserByIdAsync(string id);
         Task<bool> IsInRoleAsync(User user, string roleName);
         Task<SignInResult> LoginAsync(LoginViewModel viewModel);
         Task LogoutAsync();

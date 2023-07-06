@@ -109,6 +109,14 @@ namespace SuperShop.Web.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
+
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                var confirmEmail = await _userHelper.ConfirmEmailAsync(user, token);
+                if (!confirmEmail.Succeeded)
+                {
+                    throw new Exception(
+                        "Seeded user's email token confirmation not successful at SeedDb.SeedUser().");
+                }
             }
 
             var isInRole = await _userHelper.IsInRoleAsync(user, "Admin");

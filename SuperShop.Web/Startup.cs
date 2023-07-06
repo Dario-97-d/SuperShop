@@ -28,13 +28,18 @@ namespace SuperShop.Web
             services.AddIdentity<User, IdentityRole>(cfg =>
             {
                 cfg.User.RequireUniqueEmail = true;
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                cfg.SignIn.RequireConfirmedEmail = true;
+
                 cfg.Password.RequireDigit = false;
                 cfg.Password.RequireLowercase = false;
                 cfg.Password.RequireNonAlphanumeric = false;
                 cfg.Password.RequireUppercase = false;
                 cfg.Password.RequiredLength = 0;
                 cfg.Password.RequiredUniqueChars = 0;
-            }).AddEntityFrameworkStores<DataContext>();
+            })
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<DataContext>();
 
             services.AddAuthentication().AddCookie().AddJwtBearer(cfg =>
             {
@@ -57,6 +62,7 @@ namespace SuperShop.Web
             // Add Helpers
             services.AddScoped<IBlobHelper, BlobHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
+            services.AddScoped<IMailHelper, MailHelper>();
             services.AddScoped<IUserHelper, UserHelper>();
 
             // Add Repositories

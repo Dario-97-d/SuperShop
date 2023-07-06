@@ -18,12 +18,18 @@ namespace SuperShop.Web.Controllers
     public class AccountController : Controller
     {
         private readonly IConfiguration _configuration;
+        private readonly IMailHelper _mailHelper;
         private readonly IUserHelper _userHelper;
         private readonly ICountryRepository _countryRepository;
 
-        public AccountController(IConfiguration configuration, IUserHelper userHelper, ICountryRepository countryRepository)
+        public AccountController(
+            IConfiguration configuration,
+            IMailHelper mailHelper,
+            IUserHelper userHelper,
+            ICountryRepository countryRepository)
         {
             _configuration = configuration;
+            _mailHelper = mailHelper;
             _userHelper = userHelper;
             _countryRepository = countryRepository;
         }
@@ -85,6 +91,12 @@ namespace SuperShop.Web.Controllers
         [HttpPost, ActionName("Register")]
         public async Task<IActionResult> RegisterAsync(RegisterNewUserViewModel model)
         {
+            // Reset model's Countries' and Cities' lists
+            // for View(model)
+            // because POST doesn't bring them through
+            model.Countries = await _countryRepository.GetComboCountriesAsync();
+            model.Cities = await _countryRepository.GetComboCitiesOfCountryAsync(model.CountryId);
+
             if (ModelState.IsValid)
             {
                 // Checking user is already registered
@@ -129,30 +141,39 @@ namespace SuperShop.Web.Controllers
 
                 await _userHelper.AddUserToRoleAsync(user, "Customer");
 
-                // Preparing automatic login
-
-                var login = new LoginViewModel
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                var tokenLink = Url.Action("ConfirmEmail", "Account", new
                 {
-                    Username = model.Username,
-                    Password = model.Password,
-                    RememberMe = false
-                };
+                    userid = user.Id,
+                    token
+                }, protocol: HttpContext.Request.Scheme);
 
-                return await LoginAsync(login);
+                Response sendEmail = _mailHelper.SendEmail(
+                    user.Email,
+                    "Email confirmation",
+                    
+                    "<h2>Email confirmation</h2>" +
+                    "<p>Click this link to activate account:</p>" +
+                    "<a href=\""+tokenLink+"\">Confirm email</a>");
 
-                //var resultLogin = await _userHelper.LoginAsync(login);
-                //if (!resultLogin.Succeeded)
-                //{
-                //    ModelState.AddModelError(string.Empty, "Could not login.");
-                //    return View(model);
-                //}
+                if (sendEmail.IsSuccess)
+                {
+                    ViewBag.Message =
+                        "Account confirmation instructions " +
+                        "have been sent to the registered email address.";
+                }
+                else
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "Could not send email for account confirmation.");
+                }
 
-                //// Success
-                //return RedirectToAction("Index", "Home");
+                return View(model);
             }
 
             // !ModelState.IsValid
-
+            ModelState.AddModelError(string.Empty, "Could not register account.");
             return View(model);
         }
 
@@ -321,6 +342,26 @@ namespace SuperShop.Web.Controllers
             }
 
             return BadRequest();
+        }
+
+
+        public async Task<IActionResult> ConfirmEmail(string userid, string token)
+        {
+            if (string.IsNullOrEmpty(userid) || string.IsNullOrEmpty(token))
+                return NotFound();
+
+            // Get User by Id
+
+            var user = await _userHelper.GetUserByIdAsync(userid);
+            if (user == null) return NotFound();
+
+            // Confirm Email
+
+            var confirmEmail = await _userHelper.ConfirmEmailAsync(user, token);
+            if (!confirmEmail.Succeeded) return NotFound();
+
+            // Success
+            return View();
         }
 
 
