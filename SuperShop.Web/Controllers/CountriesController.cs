@@ -5,16 +5,19 @@ using Microsoft.AspNetCore.Mvc;
 using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
 using SuperShop.Web.Models;
+using Vereyon.Web;
 
 namespace SuperShop.Web.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class CountriesController : Controller
     {
+        private readonly IFlashMessage _flashMessage;
         private readonly ICountryRepository _countryRepository;
 
-        public CountriesController(ICountryRepository countryRepository)
+        public CountriesController(IFlashMessage flashMessage, ICountryRepository countryRepository)
         {
+            _flashMessage = flashMessage;
             _countryRepository = countryRepository;
         }
 
@@ -57,8 +60,15 @@ namespace SuperShop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _countryRepository.CreateAsync(country);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _countryRepository.CreateAsync(country);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    _flashMessage.Danger("This country is already registered.");
+                }
             }
 
             return View(country);

@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
 using SuperShop.Web.Helpers;
+using Vereyon.Web;
 
 namespace SuperShop.Web
 {
@@ -69,6 +70,8 @@ namespace SuperShop.Web
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+
+            services.AddFlashMessage();
 
             services.ConfigureApplicationCookie(options =>
             {
