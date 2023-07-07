@@ -4,74 +4,96 @@
     ViewData["Title"] = "Index";
 }
 
-<h3>All Products</h3>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
 
 <p>
     <a asp-action="Create" class="btn btn-primary">New Product</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                <a href="@Url.Content($"~/Products/Index/{Html.DisplayNameFor(model => model.Name)}")">
-                    @Html.DisplayNameFor(model => model.Name) <i class="fa fa-arrow-down-a-z"></i>
-                </a>
-            </th>
-            <th>
-                <a href="@Url.Content($"~/Products/Index/{Html.DisplayNameFor(model => model.Price)}")">
-                    @Html.DisplayNameFor(model => model.Price) <i class="fa fa-arrow-down-1-9"></i>
-                </a>
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastPurchase)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastSale)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsAvailable)
-            </th>
-            <th>
-                <a href="@Url.Content($"~/Products/Index/{Html.DisplayNameFor(model => model.Stock)}")">
-                    @Html.DisplayNameFor(model => model.Stock) <i class="fa fa-arrow-down-1-9"></i>
-                </a>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                <img src="@Html.DisplayFor(modelItem => item.ImageFullPath)" alt="Image" style="max-width:32px;max-height:32px;">
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastPurchase)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastSale)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsAvailable)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Products</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-hover table-responsive table-striped" id="MyTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="@Url.Content($"~/Products/Index/{Html.DisplayNameFor(model => model.Name)}")">
+                                    @Html.DisplayNameFor(model => model.Name)
+                                </a>
+                            </th>
+                            <th>
+                                <a href="@Url.Content($"~/Products/Index/{Html.DisplayNameFor(model => model.Price)}")">
+                                    @Html.DisplayNameFor(model => model.Price)
+                                </a>
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ImageId)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LastPurchase)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LastSale)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.IsAvailable)
+                            </th>
+                            <th>
+                                <a href="@Url.Content($"~/Products/Index/{Html.DisplayNameFor(model => model.Stock)}")">
+                                    @Html.DisplayNameFor(model => model.Stock)
+                                </a>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Price)
+                                </td>
+                                <td>
+                                    <img src="@Html.DisplayFor(modelItem => item.ImageFullPath)" alt="Image" style="max-width:32px;max-height:32px;">
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastPurchase)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastSale)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.IsAvailable)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Stock)
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info"><i class="fa fa-list"></i></a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning"><i class="fa fa-edit"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#MyTable').DataTable();
+        });
+    </script>
 }
-    </tbody>
-</table>
