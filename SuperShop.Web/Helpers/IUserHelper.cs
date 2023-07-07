@@ -13,11 +13,13 @@ namespace SuperShop.Web.Helpers
         Task CheckRoleAsync(string roleName);
         Task<IdentityResult> ConfirmEmailAsync(User user, string token);
         Task<string> GenerateEmailConfirmationTokenAsync(User user);
+        Task<string> GeneratePasswordResetTolenAsync(User user);
         Task<User> GetUserByEmailAsync(string email);
         Task<User> GetUserByIdAsync(string id);
         Task<bool> IsInRoleAsync(User user, string roleName);
         Task<SignInResult> LoginAsync(LoginViewModel viewModel);
         Task LogoutAsync();
+        Task<IdentityResult> ResetPassword(User user, string token, string password);
         Task<IdentityResult> UpdateUserAsync(User user);
         Task<SignInResult> ValidatePasswordAsync(User user, string password);
     }

@@ -298,6 +298,95 @@ namespace SuperShop.Web.Controllers
         }
 
 
+        public IActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "This email is not registered.");
+                    return View(model);
+                }
+
+                var token = await _userHelper.GeneratePasswordResetTolenAsync(user);
+
+                var link = Url.Action(
+                    "ResetPassword",
+                    "Account",
+                    new { token },
+                    protocol: HttpContext.Request.Scheme);
+
+                var emailBody = "<h2>Reset password</h2>" +
+                    "<p>Click the link to reset password:</p>" +
+                    "<a href=\"" + link + "\">Reset password</a>";
+
+                Response sendEmail = _mailHelper.SendEmail(
+                    model.Email,
+                    "Password Recovery",
+                    emailBody);
+
+                if (sendEmail.IsSuccess)
+                {
+                    ViewBag.Message =
+                        "Password recovery instructions " +
+                        "have been sent to the registered email.";
+                }
+                else ModelState.AddModelError(string.Empty, "Could not send password recovery email.");
+
+                return View();
+            }
+
+            ModelState.AddModelError(string.Empty, "Something went wrong.");
+            return View(model);
+        }
+
+
+        public IActionResult ResetPassword(string token)
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    var resetPassword = await _userHelper.ResetPassword(user, model.Token, model.Password);
+                    if (resetPassword.Succeeded)
+                    {
+                        ViewBag.Message = "Password reset successful!";
+                        return View();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Could not reset password.");
+                        return View(model);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Could not find user.");
+                    return View(model);
+                }
+            }
+            
+            ModelState.AddModelError(string.Empty, "Could not reset password.");
+            return View(model);
+        }
+
+
+
         [HttpPost]
         public async Task<IActionResult> CreateToken([FromBody]LoginViewModel model)
         {
