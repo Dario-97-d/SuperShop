@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Prism;
 using Prism.Ioc;
 using SuperShop.Prism.Services;
@@ -23,6 +24,9 @@ namespace SuperShop.Prism
             InitializeComponent();
 
             await NavigationService.NavigateAsync("NavigationPage/LoginPage");
+
+            // Prevent DenialOfService attack
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { MaxDepth = 128 };
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
