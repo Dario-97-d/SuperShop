@@ -66,6 +66,9 @@ namespace SuperShop.Web
             services.AddScoped<IMailHelper, MailHelper>();
             services.AddScoped<IUserHelper, UserHelper>();
 
+            // Add Unit of Work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             // Add Repositories
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();

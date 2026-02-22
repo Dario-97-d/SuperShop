@@ -7,13 +7,14 @@ namespace SuperShop.Web.Data
 {
     public interface IOrderRepository
     {
-        Task AddItemToOrderAsync(AddItemViewModel model, string userName);
-        Task<bool> ConfirmOrderAsync(string userName);
+        Task AddItemToOrderAsync(AddItemViewModel model, User user);
+        Task<bool> ConfirmOrderAsync(User user);
         Task DeleteDetailTempAsync(int id);
         Task DeliverOrder(DeliveryViewModel model);
         Task<Order> GetOrderAsync(int id);
-        Task<IQueryable<OrderDetailTemp>> GetOrderDetailsTempAsync(string userName);
-        Task<IQueryable<Order>> GetOrdersAsync(string userName);
+        IQueryable<OrderDetailTemp> GetOrderDetailsTemp(User user);
+        IQueryable<Order> GetOrders(User user);
+        IQueryable<Order> GetOrdersAdmin();
         Task ModifyOrderDetailTempQuantityAsync(int id, double quantity);
     }
 }

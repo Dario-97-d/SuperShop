@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperShop.Web.Data;
+using SuperShop.Web.Helpers;
 using SuperShop.Web.Models;
 
 namespace SuperShop.Web.Controllers
@@ -9,19 +10,25 @@ namespace SuperShop.Web.Controllers
     [Authorize]
     public class OrdersController : Controller
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IProductRepository _productRepository;
+        private readonly IUserHelper _userHelper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrdersController(IOrderRepository orderRepository, IProductRepository productRepository)
+        public OrdersController(IUserHelper userHelper, IUnitOfWork unitOfWork)
         {
-            _orderRepository = orderRepository;
-            _productRepository = productRepository;
+            _userHelper = userHelper;
+            _unitOfWork = unitOfWork;
         }
 
 
         public async Task<IActionResult> Index()
         {
-            var model = await _orderRepository.GetOrdersAsync(User.Identity.Name);
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            if (user == null) return NotFound();
+
+            var model = await _userHelper.IsInRoleAsync(user, "Admin") ?
+                _unitOfWork.OrderRepository.GetOrdersAdmin() :
+                _unitOfWork.OrderRepository.GetOrders(user);
+
             return View(model);
         }
 
@@ -29,7 +36,7 @@ namespace SuperShop.Web.Controllers
         {
             var model = new AddItemViewModel
             {
-                Products = await _productRepository.GetComboProductsAsync(),
+                Products = await _unitOfWork.ProductRepository.GetComboProductsAsync(),
                 Quantity = 1
             };
             return View(model);
@@ -40,7 +47,10 @@ namespace SuperShop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _orderRepository.AddItemToOrderAsync(model, User.Identity.Name);
+                var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+                if (user == null) return NotFound();
+
+                await _unitOfWork.OrderRepository.AddItemToOrderAsync(model, user);
                 return RedirectToAction(nameof(Create));
             }
 
@@ -50,7 +60,10 @@ namespace SuperShop.Web.Controllers
 
         public async Task<IActionResult> ConfirmOrder()
         {
-            var success = await _orderRepository.ConfirmOrderAsync(User.Identity.Name);
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            if (user == null) return NotFound();
+
+            var success = await _unitOfWork.OrderRepository.ConfirmOrderAsync(user);
 
             if (success)
             {
@@ -62,7 +75,10 @@ namespace SuperShop.Web.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var model = await _orderRepository.GetOrderDetailsTempAsync(User.Identity.Name);
+            var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
+            if (user == null) return NotFound();
+
+            var model = _unitOfWork.OrderRepository.GetOrderDetailsTemp(user);
             return View(model);
         }
 
@@ -70,7 +86,7 @@ namespace SuperShop.Web.Controllers
         {
             if (id == null) return NotFound();
 
-            await _orderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, -1);
+            await _unitOfWork.OrderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, -1);
             return RedirectToAction(nameof(Create));
         }
 
@@ -78,7 +94,7 @@ namespace SuperShop.Web.Controllers
         {
             if (id == null) return NotFound();
 
-            await _orderRepository.DeleteDetailTempAsync(id.Value);
+            await _unitOfWork.OrderRepository.DeleteDetailTempAsync(id.Value);
             return RedirectToAction(nameof(Create));
         }
 
@@ -87,7 +103,7 @@ namespace SuperShop.Web.Controllers
             if (id == null)
                 return NotFound();
 
-            var order = await _orderRepository.GetOrderAsync(id.Value);
+            var order = await _unitOfWork.OrderRepository.GetOrderAsync(id.Value);
             if (order == null)
                 return NotFound();
 
@@ -105,7 +121,7 @@ namespace SuperShop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _orderRepository.DeliverOrder(model);
+                await _unitOfWork.OrderRepository.DeliverOrder(model);
                 TempData["UserMessage"] = "Delivered.";
                 return RedirectToAction(nameof(Index));
             }
@@ -118,7 +134,7 @@ namespace SuperShop.Web.Controllers
         {
             if (id == null) return NotFound();
 
-            await _orderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, 1);
+            await _unitOfWork.OrderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, +1);
             return RedirectToAction(nameof(Create));
         }
     }

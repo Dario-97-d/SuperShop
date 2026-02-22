@@ -11,23 +11,15 @@ namespace SuperShop.Web.Data
     public class OrderRepository : GenericRepository<Order>, IOrderRepository
     {
         private readonly DataContext _context;
-        readonly IUserHelper _userHelper;
 
-        public OrderRepository(DataContext context, IUserHelper userHelper) : base(context)
+        public OrderRepository(DataContext context) : base(context)
         {
             _context = context;
-            _userHelper = userHelper;
         }
 
 
-        public async Task AddItemToOrderAsync(AddItemViewModel model, string userName)
+        public async Task AddItemToOrderAsync(AddItemViewModel model, User user)
         {
-            // Get User
-
-            var user = await _userHelper.GetUserByEmailAsync(userName);
-            if (user == null) return;
-            
-
             // Get Product
 
             var product = await _context.Products.FindAsync(model.ProductId);
@@ -68,13 +60,8 @@ namespace SuperShop.Web.Data
             await base.SaveAsync();
         }
 
-        public async Task<bool> ConfirmOrderAsync(string userName)
+        public async Task<bool> ConfirmOrderAsync(User user)
         {
-            // Get User
-
-            var user = await _userHelper.GetUserByEmailAsync(userName);
-            if (user == null) return false;
-
             // Get Temporary Order Details
 
             var orderDetailsTemp = await _context.OrderDetailsTemp
@@ -113,7 +100,7 @@ namespace SuperShop.Web.Data
             // Save changes
 
             await base.SaveAsync();
-            
+
             return true;
         }
 
@@ -141,12 +128,8 @@ namespace SuperShop.Web.Data
             return await _context.Orders.FindAsync(id);
         }
 
-        public async Task<IQueryable<OrderDetailTemp>> GetOrderDetailsTempAsync(string userName)
+        public IQueryable<OrderDetailTemp> GetOrderDetailsTemp(User user)
         {
-            var user = await _userHelper.GetUserByEmailAsync(userName);
-            if (user == null)
-                return null;
-
             return _context.OrderDetailsTemp
                 .AsNoTracking()
                 .Where(odt => odt.User.Id == user.Id)
@@ -154,30 +137,22 @@ namespace SuperShop.Web.Data
                 .OrderBy(odt => odt.Product.Name);
         }
 
-        public async Task<IQueryable<Order>> GetOrdersAsync(string userName)
+        public IQueryable<Order> GetOrders(User user)
         {
-            var user = await _userHelper.GetUserByEmailAsync(userName);
-            if (user == null)
-                return null;
+            return _context.Orders.AsNoTracking()
+                .Where(o => o.User.Id == user.Id)
+                .OrderByDescending(o => o.OrderDate)
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product);
+        }
 
-            if (await _userHelper.IsInRoleAsync(user, "Admin"))
-            {
-                return _context.Orders
-                    .AsNoTracking()
-                    .OrderByDescending(o => o.OrderDate)
-                    .Include(o => o.User)
-                    .Include(o => o.Items)
-                    .ThenInclude(i => i.Product);
-            }
-            else
-            {
-                return _context.Orders
-                    .AsNoTracking()
-                    .Where(o => o.User.Id == user.Id)
-                    .OrderByDescending(o => o.OrderDate)
-                    .Include(o => o.Items)
-                    .ThenInclude(i => i.Product);
-            }
+        public IQueryable<Order> GetOrdersAdmin()
+        {
+            return _context.Orders.AsNoTracking()
+                .OrderByDescending(o => o.OrderDate)
+                .Include(o => o.User)
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product);
         }
 
         public async Task ModifyOrderDetailTempQuantityAsync(int id, double quantity)
