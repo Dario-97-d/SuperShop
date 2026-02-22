@@ -180,8 +180,8 @@ namespace SuperShop.Web.Controllers
 
 
         [Authorize]
-        [ActionName("ChangeUser")]
-        public async Task<IActionResult> ChangeUserAsync()
+        [ActionName("EditUser")]
+        public async Task<IActionResult> EditUserAsync()
         {
             ViewBag.UserMessage = TempData["UserMessage"] ?? "";
 
@@ -193,7 +193,7 @@ namespace SuperShop.Web.Controllers
                 var country = await _countryRepository.GetCountryOfCityAsync(user.CityId);
                 var countryId = country?.Id ?? 0;
 
-                var model = new ChangeUserViewModel
+                var model = new EditUserViewModel
                 {
                     FirstName = user.FirstName,
                     LastName = user.LastName,
@@ -212,8 +212,8 @@ namespace SuperShop.Web.Controllers
 
 
         [Authorize]
-        [HttpPost, ActionName("ChangeUser")]
-        public async Task<IActionResult> ChangeUserAsync(ChangeUserViewModel model)
+        [HttpPost, ActionName("EditUser")]
+        public async Task<IActionResult> EditUserAsync(EditUserViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -287,7 +287,7 @@ namespace SuperShop.Web.Controllers
                 if (result.Succeeded)
                 {
                     TempData["UserMessage"] = "Password changed.";
-                    return RedirectToAction(nameof(ChangeUserAsync));
+                    return RedirectToAction(nameof(EditUserAsync));
                 }
                 else
                 {

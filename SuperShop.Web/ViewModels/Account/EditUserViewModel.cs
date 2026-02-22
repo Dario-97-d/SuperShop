@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SuperShop.Web.ViewModels.Account
 {
-    public class ChangeUserViewModel
+    public class EditUserViewModel
     {
         [Required]
         [DisplayName("First name")]
