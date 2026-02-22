@@ -1,4 +1,6 @@
-﻿namespace SuperShop.Web.Helpers
+﻿using SuperShop.Web.Utils;
+
+namespace SuperShop.Web.Helpers.Interfaces
 {
     public interface IMailHelper
     {

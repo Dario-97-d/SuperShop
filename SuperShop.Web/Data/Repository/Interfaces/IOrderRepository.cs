@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Models;
+using SuperShop.Web.ViewModels;
 
-namespace SuperShop.Web.Data
+namespace SuperShop.Web.Data.Repository.Interfaces
 {
     public interface IOrderRepository
     {

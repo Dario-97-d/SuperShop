@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using SuperShop.Web.Data.Repository;
 
 namespace SuperShop.Web.Data
 {

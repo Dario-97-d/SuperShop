@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data.Entities;
+using SuperShop.Web.Data.Repository.Interfaces;
 
-namespace SuperShop.Web.Data
+namespace SuperShop.Web.Data.Repository
 {
     public class ProductRepository : GenericRepository<Product>, IProductRepository
     {

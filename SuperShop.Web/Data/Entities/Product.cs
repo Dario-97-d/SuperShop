@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using SuperShop.Web.Models;
+using SuperShop.Web.ViewModels;
 
 namespace SuperShop.Web.Data.Entities
 {

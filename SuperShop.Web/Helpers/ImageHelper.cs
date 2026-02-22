@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using SuperShop.Web.Helpers.Interfaces;
 
 namespace SuperShop.Web.Helpers
 {

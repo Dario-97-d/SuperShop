@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data.Entities;
+using SuperShop.Web.Data.Repository.Interfaces;
 using SuperShop.Web.Helpers;
-using SuperShop.Web.Models;
+using SuperShop.Web.ViewModels;
 
-namespace SuperShop.Web.Data
+namespace SuperShop.Web.Data.Repository
 {
     public class OrderRepository : GenericRepository<Order>, IOrderRepository
     {
@@ -57,7 +58,7 @@ namespace SuperShop.Web.Data
                 _context.OrderDetailsTemp.Update(orderDetailTemp);
             }
 
-            await base.SaveAsync();
+            await SaveAsync();
         }
 
         public async Task<bool> ConfirmOrderAsync(User user)
@@ -94,12 +95,12 @@ namespace SuperShop.Web.Data
 
             // Create Order and Remove Temporary Order Details
 
-            await base.CreateAsync(order);
+            await CreateAsync(order);
             _context.OrderDetailsTemp.RemoveRange(orderDetailsTemp);
 
             // Save changes
 
-            await base.SaveAsync();
+            await SaveAsync();
 
             return true;
         }
@@ -110,7 +111,7 @@ namespace SuperShop.Web.Data
             if (orderDetailTemp == null) return;
 
             _context.OrderDetailsTemp.Remove(orderDetailTemp);
-            await base.SaveAsync();
+            await SaveAsync();
         }
 
         public async Task DeliverOrder(DeliveryViewModel model)
@@ -119,7 +120,7 @@ namespace SuperShop.Web.Data
             if (order != null)
             {
                 order.DeliveryDate = model.DeliveryDate;
-                await base.SaveAsync();
+                await SaveAsync();
             }
         }
 
@@ -165,7 +166,7 @@ namespace SuperShop.Web.Data
             if (orderDetailTemp.Quantity > 0)
             {
                 _context.OrderDetailsTemp.Update(orderDetailTemp);
-                await base.SaveAsync();
+                await SaveAsync();
             }
         }
     }

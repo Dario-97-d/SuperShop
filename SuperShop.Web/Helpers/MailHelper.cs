@@ -1,6 +1,8 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using SuperShop.Web.Helpers.Interfaces;
+using SuperShop.Web.Utils;
 
 namespace SuperShop.Web.Helpers
 {

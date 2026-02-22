@@ -1,5 +1,6 @@
 ﻿using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Models;
+using SuperShop.Web.Helpers.Interfaces;
+using SuperShop.Web.ViewModels;
 
 namespace SuperShop.Web.Helpers
 {

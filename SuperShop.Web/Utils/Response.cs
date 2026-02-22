@@ -1,4 +1,4 @@
-﻿namespace SuperShop.Web.Helpers
+﻿namespace SuperShop.Web.Utils
 {
     public class Response
     {

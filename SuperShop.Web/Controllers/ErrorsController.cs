@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SuperShop.Web.Models;
+using SuperShop.Web.ViewModels;
 
 namespace SuperShop.Web.Controllers
 {

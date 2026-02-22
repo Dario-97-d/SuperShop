@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Helpers;
-using SuperShop.Web.Models;
+using SuperShop.Web.Data.Repository.Interfaces;
+using SuperShop.Web.Helpers.Interfaces;
+using SuperShop.Web.Utils;
+using SuperShop.Web.ViewModels;
 
 namespace SuperShop.Web.Controllers
 {
@@ -180,7 +181,7 @@ namespace SuperShop.Web.Controllers
                         $"<br />" +
                         $"- {nameof(Order)}s";
                 }
-                
+
                 return View("Error");
             }
         }
@@ -193,7 +194,7 @@ namespace SuperShop.Web.Controllers
         async Task<Product> PrepareForCreateOrUpdate(ProductViewModel productViewModel)
         {
             var imageId = await SaveImageFileAsync(productViewModel.ImageFile);
-            
+
             var user = await _userHelper.GetUserByEmailAsync(User.Identity.Name);
 
             return new Product(productViewModel)
@@ -229,6 +230,6 @@ namespace SuperShop.Web.Controllers
         {
             return View();
         }
-    
+
     }
 }

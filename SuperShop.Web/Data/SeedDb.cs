@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Helpers;
+using SuperShop.Web.Helpers.Interfaces;
 
 namespace SuperShop.Web.Data
 {

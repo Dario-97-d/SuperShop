@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels.Account
 {
     public class RegisterNewUserViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SuperShop.Web.Data;
+using SuperShop.Web.Data.Repository.Interfaces;
 
 namespace SuperShop.Web.Controllers.API
 {

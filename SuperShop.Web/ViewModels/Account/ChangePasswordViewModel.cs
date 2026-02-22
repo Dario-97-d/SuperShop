@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels.Account
 {
     public class ChangePasswordViewModel
     {

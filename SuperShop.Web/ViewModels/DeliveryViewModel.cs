@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels
 {
     public class DeliveryViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Models;
+using SuperShop.Web.ViewModels;
 
-namespace SuperShop.Web.Helpers
+namespace SuperShop.Web.Helpers.Interfaces
 {
     public interface IConverterHelper
     {

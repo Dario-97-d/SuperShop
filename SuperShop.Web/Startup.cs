@@ -9,7 +9,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
+using SuperShop.Web.Data.Repository;
+using SuperShop.Web.Data.Repository.Interfaces;
 using SuperShop.Web.Helpers;
+using SuperShop.Web.Helpers.Interfaces;
 using Vereyon.Web;
 
 namespace SuperShop.Web

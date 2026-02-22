@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels.Account
 {
     public class ChangeUserViewModel
     {

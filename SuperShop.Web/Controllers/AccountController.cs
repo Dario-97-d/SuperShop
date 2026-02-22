@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Helpers;
-using SuperShop.Web.Models;
+using SuperShop.Web.Data.Repository.Interfaces;
+using SuperShop.Web.Helpers.Interfaces;
+using SuperShop.Web.ViewModels.Account;
+using SuperShop.Web.Utils;
 
 namespace SuperShop.Web.Controllers
 {

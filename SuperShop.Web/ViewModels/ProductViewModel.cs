@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using SuperShop.Web.Data.Entities;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels
 {
     public class ProductViewModel : Product
     {

@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperShop.Web.Data;
-using SuperShop.Web.Helpers;
-using SuperShop.Web.Models;
+using SuperShop.Web.Helpers.Interfaces;
+using SuperShop.Web.ViewModels;
 
 namespace SuperShop.Web.Controllers
 {

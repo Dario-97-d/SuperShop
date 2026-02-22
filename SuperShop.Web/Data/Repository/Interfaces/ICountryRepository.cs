@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SuperShop.Web.Data.Entities;
 
-namespace SuperShop.Web.Data
+namespace SuperShop.Web.Data.Repository.Interfaces
 {
     public interface ICountryRepository : IGenericRespository<Country>
     {

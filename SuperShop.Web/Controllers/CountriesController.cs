@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SuperShop.Web.Data;
 using SuperShop.Web.Data.Entities;
-using SuperShop.Web.Models;
+using SuperShop.Web.Data.Repository.Interfaces;
+using SuperShop.Web.ViewModels;
 using Vereyon.Web;
 
 namespace SuperShop.Web.Controllers

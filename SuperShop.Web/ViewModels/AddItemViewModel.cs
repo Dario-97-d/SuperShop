@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels
 {
     public class AddItemViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace SuperShop.Web.Models
+namespace SuperShop.Web.ViewModels.Account
 {
     public class LoginViewModel
     {
